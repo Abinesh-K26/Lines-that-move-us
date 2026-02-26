@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transit Signage Archive - Portfolio</title>
+    <style>
+        /* Base Reset & Swiss Typography */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f4f4f4; 
+            color: #111;
+            line-height: 1.3;
+            -webkit-font-smoothing: antialiased;
+            padding: 2vw 4vw;
+        }
+
+        /* Top Global Header */
+        .site-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-bottom: 1rem;
+            border-bottom: 4px solid #111;
+            margin-bottom: 4rem;
+        }
+
+        .site-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+        }
+
+        .site-meta {
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-align: right;
+        }
+
+        /* View Containers */
+        #home-view { display: block; }
+        .exhibit-view { display: none; } /* Hidden by default */
+
+        /* --- HOME VIEW STYLES --- */
+        .project-title {
+            display: inline-flex;
+            align-items: center;
+            width: 100%;
+            max-width: 420px;
+            height: 3.5rem;
+            background-color: #000;
+            /* Bottom layer: Unlit LED dots */
+            background-image: radial-gradient(circle, #222 1.5px, transparent 2px); 
+            background-size: 5px 5px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 3rem;
+            /* Layered Swiss hardware frame */
+            border: 2px solid #111; 
+            box-shadow: 0 0 0 4px #e5e5e5, 0 0 0 6px #111; 
+        }
+
+        /* Physical hardware vignette effect (recessed display) */
+        .project-title::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            box-shadow: inset 0 0 16px #000;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        /* Top layer: The perforated mask that slices the text into LED dots */
+        .project-title::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle, transparent 1.5px, #000 2px);
+            background-size: 5px 5px;
+            z-index: 2;
+            pointer-events: none;
+            /* Inner solid bezel so dots don't bleed into the physical edge */
+            box-shadow: inset 0 0 0 6px #000; 
+        }
+
+        .project-title-text {
+            color: #FFBB00;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            white-space: nowrap;
+            position: absolute;
+            z-index: 1;
+            /* Strong glow effect bleeding through the mask */
+            text-shadow: 0 0 4px #FFBB00, 0 0 10px #FF8800;
+            left: 100%;
+            top: 50%;
+            animation: led-scroll 10s linear infinite;
+        }
+
+        /* Steady linear scroll for a normal dot matrix display */
+        @keyframes led-scroll {
+            0% { left: 100%; transform: translate(0, -50%); }
+            100% { left: 0; transform: translate(-100%, -50%); }
+        }
+
+        .intro-text {
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 400; /* Changed from 700 to Non-bold */
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            max-width: 24ch;
+            margin-bottom: 6rem;
+        }
+
+        .system-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 40px 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+            border-top: 1px solid #111;
+            padding-top: 4rem;
+        }
+
+        .system-card {
+            grid-column: span 4;
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .card-number {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            border-bottom: 4px solid #111;
+            padding-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            transition: border-color 0.3s ease;
+        }
+
+        .system-card:hover .card-number {
+            border-bottom-color: #aaa;
+        }
+
+        .card-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1;
+            margin-bottom: 1rem;
+            flex-grow: 1;
+        }
+
+        .card-meta {
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            color: #555;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-visual {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            background-color: #e5e5e5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .system-card:hover .card-visual {
+            transform: translateY(-5px);
+        }
+
+        /* Coming Soon State */
+        .system-card.disabled {
+            cursor: default;
+        }
+        .system-card.disabled:hover .card-visual {
+            transform: none;
+        }
+        .system-card.disabled .card-number {
+            border-bottom-color: #ddd;
+            color: #888;
+        }
+        .system-card.disabled .card-title,
+        .system-card.disabled .card-meta {
+            color: #888;
+        }
+        .system-card.disabled .card-visual {
+            background-color: transparent;
+            border: 1px dashed #aaa;
+        }
+
+        .visual-nyc { background-color: #fff; border: 1px solid #ddd; }
+        .visual-nyc img { width: 45%; height: auto; display: block; }
+        .visual-london { background-color: #0000FF; }
+        .visual-paris { background-color: #008C5A; }
+        .visual-tokyo { background-color: #14BEE7; }
+        .visual-berlin { background-color: #F01414; }
+        .visual-swiss { background-color: #EB0000; }
+
+        /* --- EXHIBIT VIEW STYLES --- */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: #111;
+            margin-bottom: 4rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.2s ease;
+        }
+
+        .back-btn:hover {
+            border-bottom: 2px solid #111;
+        }
+
+        .exhibit-header {
+            margin-bottom: 4rem;
+        }
+
+        .exhibit-title {
+            font-size: clamp(4rem, 8vw, 8rem);
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            line-height: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .exhibit-metadata {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            border-top: 1px solid #111;
+            border-bottom: 1px solid #111;
+            padding: 1rem 0;
+            margin-bottom: 4rem;
+        }
+
+        .meta-item strong {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #555;
+            margin-bottom: 0.25rem;
+        }
+
+        .meta-item span {
+            font-size: 1.125rem;
+            font-weight: 500;
+        }
+
+        /* 12-Column Internal Grid for Case Study Content */
+        .case-study-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+        }
+
+        .text-column {
+            grid-column: 1 / span 5;
+            font-size: 1.25rem;
+            line-height: 1.5;
+        }
+
+        .text-column p {
+            margin-bottom: 2rem;
+        }
+
+        .visual-column {
+            grid-column: 7 / span 6;
+            display: flex;
+            flex-direction: column;
+            gap: 4rem;
+        }
+
+        /* Typography Specimen */
+        .specimen-box {
+            border-top: 4px solid #111;
+            padding-top: 1rem;
+        }
+
+        .specimen-label {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .type-sample {
+            font-size: clamp(3rem, 5vw, 5rem);
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            line-height: 1;
+            word-break: break-all;
+        }
+
+        .type-notes {
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            color: #555;
+        }
+        
+        /* Spacing Rules Section & Matrix */
+        .spacing-rules {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px dotted #111;
+        }
+
+        .spacing-rules h4 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 0.75rem;
+        }
+
+        .spacing-rules p {
+            font-size: 0.875rem;
+            color: #555;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .spacing-rules strong {
+            color: #111;
+        }
+
+        .matrix-container {
+            margin-top: 2rem;
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid #111;
+            background-color: #fff;
+        }
+
+        .matrix-caption {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid #111;
+            background-color: #e5e5e5;
+        }
+
+        .spacing-matrix {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        .spacing-matrix th,
+        .spacing-matrix td {
+            border: 1px solid #111;
+            padding: 0.75rem 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .spacing-matrix thead th {
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .spacing-matrix tbody th {
+            text-align: left;
+            font-weight: 700;
+            background-color: #fcfcfc;
+        }
+
+        .spacing-matrix td {
+            font-family: 'Courier New', Courier, monospace; /* Tabular lining */
+            font-weight: 500;
+        }
+
+        /* Signage Board Container */
+        .signage-board {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            background-color: #fff;
+            border: 2px solid #111;
+            margin-top: 1.5rem;
+        }
+
+        /* The Classic Unimark Black Top-Band */
+        .signage-header {
+            background-color: #111;
+            color: #fff;
+            padding: 1.25rem 2rem;
+            font-size: clamp(1.75rem, 4vw, 3rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1;
+        }
+
+        /* Marquee / Continuous Scroll */
+        .marquee-wrapper {
+            width: 100%;
+            height: clamp(200px, 25vw, 350px); /* The explicit bounding box height */
+            overflow: hidden;
+            display: flex;
+            align-items: center; /* Vertically center the track */
+            padding: 10px 0; /* 10px top + 10px bottom exactly ensures the carousel is 20px less than the bounding box */
+        }
+
+        .marquee-track {
+            display: flex;
+            align-items: center;
+            height: 100%; /* Fills the padded area perfectly */
+            width: max-content;
+            animation: marquee 30s linear infinite;
+        }
+
+        .marquee-group {
+            display: flex;
+            align-items: center;
+            height: 100%;
+            gap: 3rem;
+            padding-right: 3rem;
+            flex-shrink: 0;
+        }
+
+        /* Target the instantiated SVGs, taking the exact allowed height */
+        .marquee-group svg {
+            height: 100%; 
+            width: auto;
+            display: block;
+            flex-shrink: 0;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* Unimark Original Colors (1970) - Based on the newest specification */
+        .bg-1970-new-green { background-color: #009639; }
+        .bg-1970-new-orange { background-color: #FF6319; }
+        .bg-1970-new-blue { background-color: #0039A6; }
+        .bg-1970-new-turq { background-color: #00A9CE; }
+        .bg-1970-new-red { background-color: #EE352E; }
+        .bg-1970-new-yellow { background-color: #FCCC0A; color: #111 !important; }
+        .bg-1970-new-black { background-color: #000000; }
+        .bg-1970-new-transfer { background-color: #FFD100; color: #111 !important; }
+        .bg-1970-new-exit { background-color: #E03C31; }
+        .bg-1970-new-info { background-color: #00A3E0; }
+
+        /* Palette Grid System */
+        .palette-container {
+            display: block;
+        }
+
+        .palette-col-title {
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #111;
+            padding-bottom: 0.5rem;
+        }
+
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem 1rem;
+        }
+
+        .palette-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .palette-swatch {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 0; /* Forced sharp squares for Swiss aesthetic */
+            margin-bottom: 0.5rem;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .palette-name {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .palette-hex {
+            font-size: 0.75rem;
+            font-family: monospace;
+            color: #555;
+            margin-top: 0.1rem;
+        }
+
+        .palette-usecase {
+            font-size: 0.65rem;
+            color: #777;
+            text-transform: uppercase;
+            margin-bottom: 0.3rem;
+            line-height: 1.1;
+            font-weight: 500;
+        }
+
+        /* Iconography & Wayfinding Section */
+        .iconography-section {
+            grid-column: 1 / span 12;
+            margin-top: 6rem;
+            border-top: 1px solid #111;
+            padding-top: 4rem;
+        }
+
+        .iconography-desc {
+            font-size: 1.25rem;
+            line-height: 1.5;
+            max-width: 65ch;
+            margin-bottom: 3rem;
+            color: #333;
+        }
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            border-top: 4px solid #111;
+            padding-top: 2rem;
+        }
+
+        .icon-card {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .icon-display {
+            width: 100%;
+            aspect-ratio: 1;
+            background-color: #fff;
+            border: 1px solid #111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1rem;
+            color: #111;
+        }
+
+        .icon-display.inverse {
+            background-color: #111;
+            color: #fff;
+        }
+
+        /* Styling applied to the wrapper to leave your code untouched */
+        .icon-display a {
+            display: block;
+            width: 45%; /* Controls the size of the arrow */
+        }
+
+        .icon-display img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.2s ease;
+        }
+
+        /* Directional Rotations managed by the parent container */
+        .arrow-straight img { transform: rotate(90deg); }
+        .arrow-down img     { transform: rotate(-90deg); }
+        .arrow-left img     { transform: rotate(0deg); }
+        .arrow-right img    { transform: rotate(180deg); }
+        .arrow-bear-l img   { transform: rotate(45deg); }
+        .arrow-bear-r img   { transform: rotate(135deg); }
+
+        /* Handle image color inversion for white grid cards */
+        .icon-display:not(.inverse) img {
+            filter: invert(1);
+        }
+
+        .icon-label {
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 0.5rem;
+        }
+
+        .icon-deg {
+            color: #777;
+            font-family: monospace;
+        }
+
+        /* Global Footer */
+        .site-footer {
+            margin-top: 8rem;
+            padding-top: 2rem;
+            border-top: 4px solid #111;
+            font-size: 0.875rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .footer-legal {
+            color: #555;
+        }
+        
+        .footer-author {
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #111;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 1024px) {
+            .system-card { grid-column: span 6; }
+            .exhibit-metadata { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+            .text-column, .visual-column { grid-column: 1 / span 12; }
+            .visual-column { margin-top: 2rem; }
+            .icon-grid { grid-template-columns: repeat(2, 1fr); gap: 2rem 1rem; }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 5vw; }
+            .site-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; margin-bottom: 2.5rem; }
+            .site-meta { text-align: left; }
+            .intro-text { margin-bottom: 3rem; font-size: 2.25rem; max-width: 100%; }
+            .system-card { grid-column: span 12; margin-bottom: 1rem; }
+            
+            .back-btn { margin-bottom: 2.5rem; }
+            .exhibit-header { margin-bottom: 2.5rem; }
+            .exhibit-title { font-size: clamp(2.5rem, 10vw, 4rem); line-height: 1; margin-bottom: 1rem; }
+            .exhibit-metadata { grid-template-columns: 1fr; gap: 1.5rem; padding: 1.5rem 0; margin-bottom: 2rem; }
+            
+            .type-sample { font-size: 3rem; }
+            .palette-grid { grid-template-columns: repeat(2, 1fr); gap: 1.5rem 1rem; }
+            
+            /* Scale down the signage text and carousel track slightly for mobile so it isn't overwhelming */
+            .signage-header { padding: 1rem 1.25rem; }
+            .marquee-wrapper { height: clamp(120px, 30vw, 200px); padding: 5px 0; }
+            .marquee-group { gap: 1.5rem; padding-right: 1.5rem; }
+            
+            .icon-grid { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+        }
+
+        @media (max-width: 480px) {
+            .intro-text { font-size: 1.875rem; }
+            .palette-grid { grid-template-columns: 1fr; } /* Stack colors on very small screens */
+            .icon-grid { grid-template-columns: 1fr; } /* Single column icons for readability */
+            .icon-display { max-width: 250px; margin: 0 auto 1rem auto; } /* Keep them from getting massively huge when stacked */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Reusable SVG Definition to prevent code duplication -->
+    <svg style="display:none;" xmlns="http://www.w3.org/2000/svg">
+        <symbol id="mta-badges-svg" viewBox="0 0 54202 2008">
+            <g filter="url(#filter0_d_96_423)">
+                <path d="M1994.28 995.146C1994.28 1544.75 1548.74 1990.29 999.142 1990.29C449.54 1990.29 4 1544.75 4 995.146C4 445.542 449.54 0 999.142 0C1548.74 0 1994.28 445.542 1994.28 995.146Z" fill="#FF6319"/>
+                <path d="M1117.51 597.125V1407.77H958.222V923.089C958.601 911.711 958.032 901.851 956.515 893.507C954.998 884.785 953.292 877.579 951.395 871.89C949.499 866.201 945.896 861.461 940.587 857.668C935.657 853.876 931.485 851.032 928.072 849.135C924.658 846.86 918.591 845.343 909.868 844.584C901.145 843.447 894.319 842.878 889.389 842.878C884.458 842.499 876.305 842.119 864.927 841.74H769.357V731.948C801.972 731.948 825.486 731.569 839.897 730.81C854.308 730.052 869.857 727.207 886.544 722.277C903.61 716.968 919.728 709.003 934.898 698.384C954.619 684.352 968.272 669.372 975.857 653.444C983.821 637.515 989.51 618.742 992.923 597.125H1117.51Z" fill="white"/>
+                <path d="M4159.33 995.146C4159.33 1544.75 3713.79 1990.29 3164.18 1990.29C2614.58 1990.29 2169.04 1544.75 2169.04 995.146C2169.04 445.542 2614.58 0 3164.18 0C3713.79 0 4159.33 445.542 4159.33 995.146Z" fill="#EE352E"/>
+                <path d="M3462.31 1264.41V1407.77H2864.43V1277.5C2962.65 1217.57 3059.36 1144.57 3154.55 1058.48C3170.1 1044.83 3182.99 1032.69 3193.23 1022.07C3203.85 1011.07 3217.13 995.904 3233.06 976.563C3248.98 957.221 3261.12 936.931 3269.46 915.693C3278.19 894.076 3282.55 872.459 3282.55 850.842C3282.55 817.847 3271.55 788.835 3249.55 763.805C3227.94 738.774 3196.65 726.259 3155.69 726.259C3122.32 726.259 3095.01 735.361 3073.77 753.565C3052.53 771.39 3037.93 794.903 3029.97 824.105C3022.38 852.928 3019.73 886.681 3022 925.364L2874.1 904.316C2874.1 900.903 2873.91 895.783 2873.53 888.956C2873.15 881.751 2872.96 876.441 2872.96 873.028C2872.96 838.896 2878.84 804.005 2890.6 768.356C2902.35 732.706 2919.23 702.367 2941.23 677.336C2992.8 618.174 3066.76 588.592 3163.08 588.592C3204.8 588.592 3242.54 594.091 3276.29 605.09C3310.42 615.708 3338.11 629.741 3359.34 647.186C3380.96 664.631 3398.98 684.921 3413.39 708.055C3427.8 731.189 3437.85 754.323 3443.54 777.458C3449.6 800.592 3452.64 823.915 3452.64 847.429C3452.64 921.003 3425.14 990.595 3370.15 1056.2C3322.37 1111.57 3231.16 1180.98 3096.53 1264.41H3462.31Z" fill="white"/>
+                <path d="M6314.66 995.146C6314.66 1544.75 5869.12 1990.29 5319.52 1990.29C4769.91 1990.29 4324.37 1544.75 4324.37 995.146C4324.37 445.542 4769.91 0 5319.52 0C5869.12 0 6314.66 445.542 6314.66 995.146Z" fill="#00A9CE"/>
+                <path d="M5172.79 854.255L5024.31 821.83C5029.62 799.075 5034.74 780.112 5039.67 764.942C5044.6 749.772 5054.46 730.431 5069.25 706.918C5084.42 683.404 5103.01 663.494 5125 647.186C5174.68 608.124 5237.45 588.592 5313.3 588.592C5365.25 588.592 5412.47 597.505 5454.95 615.329C5497.8 632.775 5532.31 659.132 5558.48 694.402C5584.65 729.293 5597.73 769.873 5597.73 816.141C5597.73 865.064 5582.18 905.074 5551.08 936.173C5534.4 952.86 5513.16 965.564 5487.37 974.287C5521.88 986.423 5549 1001.97 5568.72 1020.93C5605.89 1057.34 5624.47 1105.13 5624.47 1164.29C5624.47 1209.04 5615.94 1247.72 5598.87 1280.34C5581.8 1312.96 5560.95 1339.12 5536.29 1358.84C5508.61 1380.46 5475.24 1396.77 5436.17 1407.77C5397.11 1418.77 5356.91 1424.26 5315.57 1424.26C5234.41 1424.26 5166.53 1406.25 5111.92 1370.22C5096.37 1359.98 5082.53 1348.98 5070.39 1337.23C5058.63 1325.47 5049.15 1313.14 5041.95 1300.25C5034.74 1286.98 5028.67 1275.22 5023.74 1264.98C5019.19 1254.36 5015.59 1242.04 5012.93 1228C5010.66 1213.97 5009.14 1203.73 5008.38 1197.28C5007.62 1190.84 5006.87 1181.74 5006.11 1169.98L5167.67 1147.79V1164.29C5167.67 1201.46 5181.13 1232.37 5208.06 1257.02C5235.36 1281.29 5271.2 1293.42 5315.57 1293.42C5358.43 1293.42 5394.08 1280.91 5422.52 1255.88C5450.96 1230.85 5465.19 1200.32 5465.19 1164.29C5465.19 1142.29 5459.12 1121.44 5446.98 1101.71C5434.85 1081.99 5418.73 1066.82 5398.63 1056.2C5386.49 1049.38 5371.51 1044.26 5353.69 1040.85C5336.24 1037.43 5321.07 1035.54 5308.18 1035.16C5295.28 1034.4 5276.51 1034.02 5251.86 1034.02V918.538C5284.47 918.538 5310.07 917.779 5328.66 916.262C5336.62 915.883 5344.02 915.314 5350.84 914.556C5358.05 913.797 5367.72 911.522 5379.86 907.729C5391.99 903.937 5402.23 899.196 5410.57 893.507C5419.3 887.439 5426.88 878.527 5433.33 866.77C5439.78 855.014 5443 841.171 5443 825.243C5443 792.248 5430.11 766.08 5404.32 746.739C5378.53 727.018 5347.81 717.157 5312.16 717.157C5296.99 717.157 5282.96 719.053 5270.06 722.846C5257.55 726.638 5246.93 731 5238.21 735.93C5229.86 740.481 5221.9 747.497 5214.31 756.978C5207.11 766.08 5201.61 773.665 5197.82 779.733C5194.02 785.801 5190.04 794.903 5185.87 807.039C5182.08 818.796 5179.61 826.76 5178.48 830.931C5177.34 835.103 5175.44 842.878 5172.79 854.255Z" fill="white"/>
+                <path d="M8479.7 995.146C8479.7 1544.75 8034.16 1990.29 7484.56 1990.29C6934.96 1990.29 6489.42 1544.75 6489.42 995.146C6489.42 445.542 6934.96 0 7484.56 0C8034.16 0 8479.7 445.542 8479.7 995.146Z" fill="#009639"/>
+                <path d="M7668.3 1223.45V1407.77H7514.14V1223.45H7152.91V1106.27C7241.65 993.629 7306.69 909.246 7348.03 853.117C7389.75 796.61 7450.24 710.9 7529.5 595.988H7668.3V1096.59H7783.22V1223.45H7668.3ZM7305.93 1096.59H7514.14V815.003C7469.39 879.475 7435.45 927.45 7412.31 958.928C7389.56 990.026 7354.1 1035.91 7305.93 1096.59Z" fill="white"/>
+                <path d="M10644.7 995.146C10644.7 1544.75 10199.2 1990.29 9649.6 1990.29C9100 1990.29 8654.46 1544.75 8654.46 995.146C8654.46 445.542 9100 0 9649.6 0C10199.2 0 10644.7 445.542 10644.7 995.146Z" fill="black"/>
+                <path d="M9460.77 605.09H9954.55L9932.37 734.223H9566.58L9535.3 868.477C9579.29 844.964 9628.21 833.207 9682.06 833.207C9721.51 833.207 9757.53 838.896 9790.15 850.273C9822.76 861.271 9850.07 876.252 9872.07 895.214C9894.06 913.797 9912.65 935.604 9927.82 960.634C9942.99 985.664 9953.98 1011.83 9960.81 1039.14C9967.64 1066.06 9971.05 1093.75 9971.05 1122.19C9971.05 1162.01 9964.41 1199.75 9951.14 1235.4C9937.87 1270.67 9918.33 1302.53 9892.55 1330.97C9866.76 1359.41 9832.43 1382.17 9789.58 1399.23C9747.1 1415.92 9698.75 1424.26 9644.52 1424.26C9621.01 1424.26 9597.87 1422.37 9575.12 1418.58C9552.36 1415.16 9527.52 1408.34 9500.59 1398.1C9474.05 1387.48 9450.34 1374.01 9429.49 1357.71C9408.63 1341.4 9390.04 1319.02 9373.74 1290.58C9357.43 1261.76 9346.81 1228.95 9341.88 1192.16L9504.01 1179.65C9505.15 1200.51 9510.27 1218.71 9519.37 1234.26C9528.47 1249.81 9538.52 1261.38 9549.52 1268.96C9560.52 1276.55 9573.22 1282.62 9587.63 1287.17C9602.42 1291.72 9614.18 1294.56 9622.9 1295.7C9631.62 1296.46 9640.16 1296.84 9648.5 1296.84C9703.11 1296.84 9746.16 1280.53 9777.63 1247.91C9809.49 1214.92 9825.42 1174.53 9825.42 1126.74C9825.42 1077.82 9809.11 1038.19 9776.5 1007.85C9743.88 977.131 9701.97 961.772 9650.78 961.772C9631.81 961.772 9613.99 964.237 9597.3 969.167C9580.99 973.718 9567.72 978.838 9557.48 984.527C9547.62 989.836 9537.95 997.421 9528.47 1007.28C9518.99 1016.76 9512.54 1023.78 9509.13 1028.33C9505.71 1032.88 9501.54 1038.95 9496.61 1046.53L9367.48 1028.9L9460.77 605.09Z" fill="white"/>
+                <path d="M12800.1 995.146C12800.1 1544.75 12354.5 1990.29 11804.9 1990.29C11255.3 1990.29 10809.8 1544.75 10809.8 995.146C10809.8 445.542 11255.3 0 11804.9 0C12354.5 0 12800.1 445.542 12800.1 995.146Z" fill="#009639"/>
+                <path d="M12126.4 795.093L11971.1 816.141C11965.8 793.007 11960.1 776.32 11954 766.08C11943.8 747.497 11929.4 733.275 11910.8 723.415C11892.2 713.554 11871.9 708.624 11849.9 708.624C11801 708.624 11759.5 730.052 11725.3 772.907C11711.3 789.973 11700.1 809.314 11691.8 830.931C11683.4 852.549 11678.1 869.804 11675.8 882.699C11673.9 895.593 11672.2 911.711 11670.7 931.053C11680.6 922.709 11689.3 915.883 11696.9 910.573C11704.9 904.885 11717 897.3 11733.3 887.819C11749.6 878.337 11768.6 871.132 11790.2 866.201C11811.8 861.271 11834.9 858.806 11859.6 858.806C11936.9 858.806 12001.4 884.974 12053 937.31C12105 989.267 12130.9 1055.26 12130.9 1135.28C12130.9 1190.65 12117.5 1240.52 12090.5 1284.89C12064 1328.88 12027.6 1363.21 11981.3 1387.86C11935.1 1412.13 11883.7 1424.26 11827.2 1424.26C11778.2 1424.26 11733.5 1414.4 11692.9 1394.68C11646.6 1371.55 11610 1339.31 11583.1 1297.97C11558.1 1260.43 11539.7 1215.68 11527.9 1163.72C11516.6 1111.39 11510.9 1059.62 11510.9 1008.42C11510.9 938.638 11520 876.82 11538.2 822.967C11556.8 769.114 11581.2 725.121 11611.6 690.989C11638.1 661.787 11671.9 637.515 11712.8 618.174C11753.8 598.453 11801.6 588.592 11856.2 588.592C11924.1 588.592 11981.5 604.521 12028.5 636.377C12045.2 648.134 12059.6 661.597 12071.8 676.767C12084.3 691.558 12094.1 707.486 12101.4 724.553C12108.9 741.239 12114.1 753.944 12116.7 762.667C12119.7 771.39 12123 782.198 12126.4 795.093ZM11976.2 1138.69C11975.1 1096.97 11961.6 1062.65 11935.8 1035.73C11910 1008.8 11877.6 995.335 11838.5 995.335C11796.4 995.335 11760.2 1009.94 11729.9 1039.14C11699.9 1068.34 11684.9 1104.18 11684.9 1146.66C11684.9 1183.82 11698 1217.76 11724.2 1248.48C11750.7 1279.2 11785.8 1294.56 11829.4 1294.56C11870.4 1294.56 11905.5 1280.34 11934.7 1251.9C11963.9 1223.07 11977.7 1185.34 11976.2 1138.69Z" fill="white"/>
+                <path d="M14965.1 995.146C14965.1 1544.75 14519.6 1990.29 13970 1990.29C13420.4 1990.29 12974.8 1544.75 12974.8 995.146C12974.8 445.542 13420.4 0 13970 0C14519.6 0 14965.1 445.542 14965.1 995.146Z" fill="#FF6319"/>
+                <path d="M14263.5 605.09V749.583C14227.1 796.61 14196 841.93 14170.3 885.543C14144.5 929.157 14118.5 984.337 14092.3 1051.08C14042.3 1178.51 14013.1 1297.41 14004.7 1407.77H13812.4C13836.7 1284.13 13878.2 1160.69 13937 1037.43C13982.9 937.69 14038.5 841.74 14103.7 749.583H13699.2V605.09H14263.5Z" fill="white"/>
+                <path d="M17130.2 995.146C17130.2 1544.75 16684.6 1990.29 16135 1990.29C15585.4 1990.29 15139.9 1544.75 15139.9 995.146C15139.9 445.542 15585.4 0 16135 0C16684.6 0 17130.2 445.542 17130.2 995.146Z" fill="#0039A6"/>
+                <path d="M16228.9 585.179L16499.1 1407.77H16326.7L16290.3 1291.15H15972.3L15937.6 1407.77H15770.9L16035.5 585.179H16228.9ZM16012.1 1152.34H16247.7L16127.6 766.08L16012.1 1152.34Z" fill="white"/>
+                <path d="M19285.5 995.146C19285.5 1544.75 18840 1990.29 18290.3 1990.29C17740.7 1990.29 17295.2 1544.75 17295.2 995.146C17295.2 445.542 17740.7 0 18290.3 0C18840 0 19285.5 445.542 19285.5 995.146Z" fill="#00A9CE"/>
+                <path d="M18019.3 585.179L18289.5 1407.77H18117.1L18080.7 1291.15H17762.7L17728 1407.77H17561.3L17825.9 585.179H18019.3ZM17802.5 1152.34H18038L17918 766.08L17802.5 1152.34Z" fill="white"/>
+                <path d="M18749.2 585.179L19019.4 1407.77H18847L18810.6 1291.15H18492.6L18457.9 1407.77H18291.2L18555.7 585.179H18749.2ZM18532.4 1152.34H18767.9L18647.9 766.08L18532.4 1152.34Z" fill="white"/>
+                <path d="M21450.5 995.146C21450.5 1544.75 21005 1990.29 20455.4 1990.29C19905.8 1990.29 19460.2 1544.75 19460.2 995.146C19460.2 445.542 19905.8 0 20455.4 0C21005 0 21450.5 445.542 21450.5 995.146Z" fill="#FF6319"/>
+                <path d="M20134.4 585.179H20479.2C20519.7 585.179 20549.7 586.317 20569.1 588.592C20631.2 596.936 20678.1 619.311 20709.6 655.719C20741 691.748 20756.8 736.309 20756.8 789.404C20756.8 819.364 20750.5 848.566 20738 877.01C20725.5 905.454 20703.7 926.691 20672.6 940.724C20663.1 944.516 20650.4 948.309 20634.5 952.101C20649.3 955.514 20663.5 959.876 20677.1 965.185C20718.9 980.355 20749.8 1006.33 20769.9 1043.12C20790.3 1079.53 20800.6 1118.4 20800.6 1159.74C20800.6 1188.56 20795.3 1219.28 20784.7 1251.9C20778.6 1268.2 20771.4 1283.18 20763 1296.84C20755.1 1310.49 20746.9 1322.44 20738.6 1332.68C20730.2 1342.54 20720.2 1351.45 20708.4 1359.41C20696.7 1367 20686.2 1373.45 20677.1 1378.75C20668 1383.68 20656.5 1388.05 20642.4 1391.84C20628.4 1395.25 20617 1397.91 20608.3 1399.8C20599.6 1401.7 20587.8 1403.41 20573 1404.92C20558.2 1406.06 20547.2 1406.82 20540 1407.2C20533.2 1407.2 20522.6 1407.39 20508.2 1407.77H20134.4V585.179ZM20302.3 715.451V900.903H20445.6C20497.2 900.903 20532.1 895.404 20550.3 884.405C20555.6 881.751 20561.1 877.958 20566.8 873.028C20572.5 868.098 20578.3 859.754 20584.4 847.998C20590.5 835.862 20593.5 822.398 20593.5 807.608C20593.5 776.889 20581.4 752.806 20557.1 735.361C20540 723.604 20510.6 716.968 20468.9 715.451H20302.3ZM20467.8 1034.02H20302.3V1266.69H20459.3C20515.8 1266.69 20554.3 1262.14 20574.7 1253.03C20615.3 1235.59 20635.6 1202.59 20635.6 1154.05C20635.6 1132.05 20631.2 1112.52 20622.5 1095.46C20616.5 1084.46 20608.5 1074.98 20598.6 1067.01C20589.2 1059.05 20579.9 1053.17 20570.8 1049.38C20562 1045.21 20550.7 1041.98 20536.6 1039.71C20523 1037.05 20511.8 1035.54 20503.1 1035.16C20494.3 1034.78 20482.6 1034.4 20467.8 1034.02Z" fill="white"/>
+                <path d="M23615.6 995.146C23615.6 1544.75 23170 1990.29 22620.4 1990.29C22070.8 1990.29 21625.3 1544.75 21625.3 995.146C21625.3 445.542 22070.8 0 22620.4 0C23170 0 23615.6 445.542 23615.6 995.146Z" fill="#009639"/>
+                <path d="M22471.5 1101.15L22621.6 1173.39C22589.4 1262.14 22542.2 1327.56 22480 1369.65C22417.8 1411.37 22346.7 1432.23 22266.7 1432.23C22204.5 1432.23 22149.3 1421.23 22101.1 1399.23C22053 1376.86 22013.3 1348.98 21982.2 1315.61C21947.7 1277.69 21920.8 1230.47 21901.5 1173.96C21882.1 1117.07 21872.4 1056.39 21872.4 991.922C21872.4 950.584 21876.4 910.384 21884.4 871.321C21892.7 831.88 21906.8 793.196 21926.5 755.272C21946.6 716.968 21971.2 683.783 22000.4 655.719C22030 627.276 22067.8 604.331 22113.6 586.886C22159.9 569.44 22211.7 560.718 22268.9 560.718C22304.6 560.718 22337.8 564.51 22368.5 572.095C22399.2 579.301 22425.2 588.403 22446.4 599.401C22468.1 610.02 22488 623.862 22506.2 640.928C22524.4 657.615 22538.8 673.164 22549.4 687.576C22560.4 701.987 22570.6 719.053 22580.1 738.774C22589.6 758.116 22596.2 773.286 22600 784.284C22603.8 794.903 22608 807.418 22612.5 821.83L22443.6 867.339C22439.4 838.516 22433.2 815.193 22424.8 797.368C22416.9 779.164 22406 763.615 22392.4 750.721C22379.1 737.826 22364.9 728.535 22349.7 722.846C22334.9 717.157 22321.5 713.175 22309.3 710.9C22297.2 708.624 22285.3 707.486 22273.5 707.486C22243.2 707.486 22214.5 713.554 22187.6 725.69C22160.7 737.826 22136.6 755.461 22115.4 778.595C22094.1 801.729 22077.2 832.448 22064.7 870.752C22052.6 908.677 22046.5 951.722 22046.5 999.886C22046.5 1046.15 22053 1087.49 22065.9 1123.9C22078.8 1159.93 22095.8 1188.75 22117.1 1210.37C22138.7 1231.61 22162.4 1247.72 22188.2 1258.72C22214.3 1269.72 22241.6 1275.22 22270.1 1275.22C22288.3 1275.22 22305.4 1272.94 22321.3 1268.39C22337.6 1263.84 22351.4 1258.34 22362.8 1251.9C22374.6 1245.45 22385.9 1236.54 22396.9 1225.16C22407.9 1213.78 22416.7 1203.92 22423.1 1195.58C22429.6 1186.86 22436.4 1175.48 22443.6 1161.45C22451.2 1147.41 22456.5 1136.98 22459.5 1130.16C22462.6 1123.33 22466.5 1113.66 22471.5 1101.15Z" fill="white"/>
+                <path d="M23240.3 1101.15L23390.5 1173.39C23358.3 1262.14 23311.1 1327.56 23248.9 1369.65C23186.7 1411.37 23115.6 1432.23 23035.6 1432.23C22973.4 1432.23 22918.2 1421.23 22870 1399.23C22821.9 1376.86 22782.2 1348.98 22751.1 1315.61C22716.6 1277.69 22689.7 1230.47 22670.3 1173.96C22651 1117.07 22641.3 1056.39 22641.3 991.922C22641.3 950.584 22645.3 910.384 22653.3 871.321C22661.6 831.88 22675.7 793.196 22695.4 755.272C22715.5 716.968 22740.1 683.783 22769.3 655.719C22798.9 627.276 22836.6 604.331 22882.5 586.886C22928.8 569.44 22980.6 560.718 23037.8 560.718C23073.5 560.718 23106.7 564.51 23137.4 572.095C23168.1 579.301 23194.1 588.403 23215.3 599.401C23236.9 610.02 23256.8 623.862 23275 640.928C23293.3 657.615 23307.7 673.164 23318.3 687.576C23329.3 701.987 23339.5 719.053 23349 738.774C23358.5 758.116 23365.1 773.286 23368.9 784.284C23372.7 794.903 23376.9 807.418 23381.4 821.83L23212.5 867.339C23208.3 838.516 23202 815.193 23193.7 797.368C23185.7 779.164 23174.9 763.615 23161.3 750.721C23148 737.826 23133.8 728.535 23118.6 722.846C23103.8 717.157 23090.4 713.175 23078.2 710.9C23066.1 708.624 23054.1 707.486 23042.4 707.486C23012 707.486 22983.4 713.554 22956.5 725.69C22929.6 737.826 22905.5 755.461 22884.2 778.595C22863 801.729 22846.1 832.448 22833.6 870.752C22821.5 908.677 22815.4 951.722 22815.4 999.886C22815.4 1046.15 22821.9 1087.49 22834.7 1123.9C22847.6 1159.93 22864.7 1188.75 22885.9 1210.37C22907.6 1231.61 22931.3 1247.72 22957.1 1258.72C22983.2 1269.72 23010.5 1275.22 23039 1275.22C23057.2 1275.22 23074.2 1272.94 23090.2 1268.39C23106.5 1263.84 23120.3 1258.34 23131.7 1251.9C23143.5 1245.45 23154.8 1236.54 23165.8 1225.16C23176.8 1213.78 23185.5 1203.92 23192 1195.58C23198.4 1186.86 23205.3 1175.48 23212.5 1161.45C23220.1 1147.41 23225.4 1136.98 23228.4 1130.16C23231.4 1123.33 23235.4 1113.66 23240.3 1101.15Z" fill="white"/>
+                <path d="M25770.9 995.146C25770.9 1544.75 25325.4 1990.29 24775.8 1990.29C24226.2 1990.29 23780.6 1544.75 23780.6 995.146C23780.6 445.542 24226.2 0 24775.8 0C25325.4 0 25770.9 445.542 25770.9 995.146Z" fill="#FF6319"/>
+                <path d="M24445.1 1407.77V585.179H24734.1C24754.6 585.558 24770.7 586.127 24782.4 586.886C24794.6 587.644 24810.7 589.161 24830.8 591.437C24851.3 593.333 24868.9 596.556 24883.7 601.107C24898.9 605.658 24915.6 611.537 24933.8 618.742C24952 625.948 24969.4 635.429 24986.1 647.186C25003.2 658.943 25019.7 672.785 25035.6 688.714C25107.3 761.15 25143.1 862.978 25143.1 994.198C25143.1 1061.32 25134.2 1121.44 25116.4 1174.53C25105.7 1206.77 25092.3 1235.59 25076 1261C25059.7 1286.03 25043.4 1306.7 25027.1 1323.01C25010.7 1338.93 24990.6 1352.59 24966.8 1363.96C24943.2 1375.34 24922.8 1383.87 24905.3 1389.56C24887.9 1395.25 24865.7 1399.61 24838.8 1402.65C24811.8 1405.3 24791.4 1406.82 24777.3 1407.2C24763.3 1407.58 24743.4 1407.77 24717.6 1407.77C24716.1 1407.77 24714.9 1407.77 24714.2 1407.77H24445.1ZM24611.8 725.121V1255.31H24713C24733.1 1254.93 24748.9 1254.36 24760.3 1253.6C24771.6 1252.84 24786.6 1251.14 24805.2 1248.48C24823.8 1245.45 24840.7 1240.52 24855.8 1233.69C24871 1226.87 24884.8 1218.14 24897.4 1207.52C24918.2 1188.94 24935.3 1162.01 24948.6 1126.74C24961.8 1091.1 24968.5 1047.29 24968.5 995.335C24968.5 914.556 24949.7 850.842 24912.1 804.195C24901.1 790.162 24888.8 778.216 24875.2 768.356C24861.5 758.495 24849.2 751.1 24838.2 746.17C24827.2 740.86 24813.3 736.688 24796.7 733.654C24780 730.62 24766.9 728.724 24757.4 727.966C24748.3 726.828 24734.7 725.88 24716.5 725.121H24611.8Z" fill="white"/>
+                <path d="M27935.9 995.146C27935.9 1544.75 27490.4 1990.29 26940.8 1990.29C26391.2 1990.29 25945.7 1544.75 25945.7 995.146C25945.7 445.542 26391.2 0 26940.8 0C27490.4 0 27935.9 445.542 27935.9 995.146Z" fill="#0039A6"/>
+                <path d="M27281.6 1256.45V1407.77H26649V585.179H27256V722.846H26816.8V884.405H27145V1031.17H26816.8V1256.45H27281.6Z" fill="white"/>
+                <path d="M30101 995.146C30101 1544.75 29655.5 1990.29 29105.8 1990.29C28556.2 1990.29 28110.7 1544.75 28110.7 995.146C28110.7 445.542 28556.2 0 29105.8 0C29655.5 0 30101 445.542 30101 995.146Z" fill="#FF6319"/>
+                <path d="M29092 1256.45V1407.77H28459.5V585.179H29066.4V722.846H28627.3V884.405H28955.5V1031.17H28627.3V1256.45H29092Z" fill="white"/>
+                <path d="M29810.9 1256.45V1407.77H29178.3V585.179H29785.3V722.846H29346.1V884.405H29674.3V1031.17H29346.1V1256.45H29810.9Z" fill="white"/>
+                <path d="M32256.3 995.146C32256.3 1544.75 31810.8 1990.29 31261.2 1990.29C30711.6 1990.29 30266 1544.75 30266 995.146C30266 445.542 30711.6 0 31261.2 0C31810.8 0 32256.3 445.542 32256.3 995.146Z" fill="#FF6319"/>
+                <path d="M31177.1 1040.85V1407.77H31008.2V585.179H31591.8V725.121H31177.1V894.076H31498.6V1040.85H31177.1Z" fill="white"/>
+                <path d="M34421.4 995.146C34421.4 1544.75 33975.8 1990.29 33426.2 1990.29C32876.6 1990.29 32431.1 1544.75 32431.1 995.146C32431.1 445.542 32876.6 0 33426.2 0C33975.8 0 34421.4 445.542 34421.4 995.146Z" fill="#009639"/>
+                <path d="M41013.6 1004.85C41013.6 1554.46 40568 2000 40018.4 2000C39468.8 2000 39023.3 1554.46 39023.3 1004.85C39023.3 455.251 39468.8 9.70874 40018.4 9.70874C40568 9.70874 41013.6 455.251 41013.6 1004.85Z" fill="black"/>
+                <path d="M33385.4 960.634V1407.77H33244.3V1356.57C33221.5 1377.43 33199.9 1392.6 33179.4 1402.08C33134.3 1422.18 33082.6 1432.23 33024.1 1432.23C32949.4 1432.23 32882.5 1413.27 32823.3 1375.34C32764.6 1337.04 32719.2 1285.46 32687.4 1220.61C32655.5 1155.38 32639.6 1082.94 32639.6 1003.3C32639.6 960.065 32644.3 917.779 32653.8 876.441C32663.7 834.724 32679.4 794.713 32701 756.409C32722.6 718.105 32749 684.542 32780.1 655.719C32811.6 626.896 32850.5 603.952 32896.7 586.886C32943.4 569.44 32994.8 560.718 33050.9 560.718C33164.7 560.718 33255.3 601.107 33322.8 681.887C33335.3 697.057 33346.5 713.365 33356.4 730.81C33366.2 748.255 33372.9 761.34 33376.3 770.062C33379.7 778.406 33384.2 790.542 33389.9 806.47L33229.5 868.477C33217.4 836.62 33207.1 813.296 33198.8 798.506C33182.5 771.2 33160.3 749.583 33132.2 733.654C33104.5 717.726 33072.9 709.762 33037.2 709.762C33000.4 709.762 32967.3 718.105 32937.7 734.792C32908.1 751.479 32884.4 773.665 32866.6 801.35C32848.7 829.035 32835.1 859.944 32825.6 894.076C32816.5 927.829 32812 963.099 32812 999.886C32812 1038.95 32816.7 1075.36 32826.2 1109.11C32836 1142.86 32850.3 1172.63 32868.8 1198.42C32887.8 1224.21 32912.1 1244.5 32941.7 1259.29C32971.6 1273.7 33005.4 1280.91 33042.9 1280.91C33096.4 1280.91 33140.4 1264.79 33174.9 1232.55C33209.4 1200.32 33230.3 1158.22 33237.5 1106.27H33037.2V960.634H33385.4Z" fill="white"/>
+                <path d="M34200.9 960.634V1407.77H34059.8V1356.57C34037.1 1377.43 34015.5 1392.6 33995 1402.08C33949.8 1422.18 33898.1 1432.23 33839.7 1432.23C33765 1432.23 33698 1413.27 33638.9 1375.34C33580.1 1337.04 33534.8 1285.46 33502.9 1220.61C33471.1 1155.38 33455.1 1082.94 33455.1 1003.3C33455.1 960.065 33459.9 917.779 33469.3 876.441C33479.2 834.724 33494.9 794.713 33516.6 756.409C33538.2 718.105 33564.5 684.542 33595.6 655.719C33627.1 626.896 33666 603.952 33712.3 586.886C33758.9 569.44 33810.3 560.718 33866.4 560.718C33980.2 560.718 34070.8 601.107 34138.3 681.887C34150.8 697.057 34162 713.365 34171.9 730.81C34181.8 748.255 34188.4 761.34 34191.8 770.062C34195.2 778.406 34199.8 790.542 34205.5 806.47L34045 868.477C34032.9 836.62 34022.7 813.296 34014.3 798.506C33998 771.2 33975.8 749.583 33947.8 733.654C33920.1 717.726 33888.4 709.762 33852.8 709.762C33816 709.762 33782.8 718.105 33753.2 734.792C33723.6 751.479 33699.9 773.665 33682.1 801.35C33664.3 829.035 33650.6 859.944 33641.1 894.076C33632 927.829 33627.5 963.099 33627.5 999.886C33627.5 1038.95 33632.2 1075.36 33641.7 1109.11C33651.6 1142.86 33665.8 1172.63 33684.4 1198.42C33703.3 1224.21 33727.6 1244.5 33757.2 1259.29C33787.2 1273.7 33820.9 1280.91 33858.5 1280.91C33911.9 1280.91 33955.9 1264.79 33990.4 1232.55C34024.9 1200.32 34045.8 1158.22 34053 1106.27H33852.8V960.634H34200.9Z" fill="white"/>
+                <path d="M40031.9 1266.16V1417.48H39507.4V594.888H39675.2V1266.16H40031.9Z" fill="white"/>
+                <path d="M40581.2 1266.16V1417.48H40056.7V594.888H40224.5V1266.16H40581.2Z" fill="white"/>
+                <path d="M36586.4 995.146C36586.4 1544.75 36140.9 1990.29 35591.3 1990.29C35041.7 1990.29 34596.1 1544.75 34596.1 995.146C34596.1 445.542 35041.7 0 35591.3 0C36140.9 0 36586.4 445.542 36586.4 995.146Z" fill="#EE352E"/>
+                <path d="M43178.6 1004.85C43178.6 1554.46 42733.1 2000 42183.5 2000C41633.9 2000 41188.3 1554.46 41188.3 1004.85C41188.3 455.251 41633.9 9.70874 42183.5 9.70874C42733.1 9.70874 43178.6 455.251 43178.6 1004.85Z" fill="#00A9CE"/>
+                <path d="M35524.8 585.179V1407.77H35357V1028.9H35011.1V1407.77H34843.3V585.179H35011.1V877.579H35357V585.179H35524.8Z" fill="white"/>
+                <path d="M36340.4 585.179V1407.77H36172.5V1028.9H35826.7V1407.77H35658.8V585.179H35826.7V877.579H36172.5V585.179H36340.4Z" fill="white"/>
+                <path d="M42560.1 594.888V1417.48H42406.5L42413.3 782.615L42258.6 1417.48H42110.7L41956.5 782.615V1417.48H41806.3V594.888H42055.5L42185.2 1171.72L42315.5 594.888H42560.1Z" fill="white"/>
+                <path d="M38848.5 995.146C38848.5 1544.75 38403 1990.29 37853.4 1990.29C37303.8 1990.29 36858.3 1544.75 36858.3 995.146C36858.3 445.542 37303.8 0 37853.4 0C38403 0 38848.5 445.542 38848.5 995.146Z" fill="#FF6319"/>
+                <path d="M45440.7 1004.85C45440.7 1554.46 44995.2 2000 44445.6 2000C43896 2000 43450.5 1554.46 43450.5 1004.85C43450.5 455.251 43896 9.70874 44445.6 9.70874C44995.2 9.70874 45440.7 455.251 45440.7 1004.85Z" fill="#FCCC0A"/>
+                <path d="M37607.3 891.801L37890.6 1407.77H37696.1L37487.3 1030.04L37362.7 1172.25V1407.77H37192.6L37199.5 585.179H37369.6L37362.7 940.724L37663.1 585.179H37874.1L37607.3 891.801Z" fill="white"/>
+                <path d="M38327.3 891.801L38610.6 1407.77H38416L38207.3 1030.04L38082.7 1172.25V1407.77H37912.6L37919.4 585.179H38089.5L38082.7 940.724L38383 585.179H38594.1L38327.3 891.801Z" fill="white"/>
+                <path d="M44773.8 594.888V1417.48H44607.2L44270.4 851.449V1417.48H44116.8V594.888H44289.2L44621.4 1154.09V594.888H44773.8Z" fill="white"/>
+                <path d="M49770.8 1004.85C49770.8 1554.46 49325.3 2000 48775.7 2000C48226.1 2000 47780.5 1554.46 47780.5 1004.85C47780.5 455.251 48226.1 9.70874 48775.7 9.70874C49325.3 9.70874 49770.8 455.251 49770.8 1004.85Z" fill="black"/>
+                <path d="M48997.4 1313.94L48946.2 1458.43C48920.1 1453.5 48895.6 1445.35 48872.9 1433.97C48830 1414.25 48794.7 1386.95 48767 1352.06C48752.3 1363.43 48740.3 1372.16 48731.2 1378.22C48722.1 1383.91 48706.2 1392.82 48683.4 1404.96C48661 1416.72 48635.6 1425.63 48607.2 1431.7C48579.1 1437.77 48549 1440.8 48516.7 1440.8C48456.8 1440.8 48401.8 1429.23 48351.8 1406.1C48302.1 1382.96 48260.7 1351.68 48227.8 1312.23C48195.1 1272.79 48169.7 1226.9 48151.5 1174.57C48133.7 1122.23 48124.8 1066.48 48124.8 1007.32C48124.8 945.123 48135 886.908 48155.5 832.676C48176 778.064 48203.9 731.796 48239.1 693.871C48274.8 655.567 48316.9 625.417 48365.4 603.421C48414.3 581.424 48466.3 570.426 48521.3 570.426C48562.6 570.426 48602.4 576.684 48640.8 589.199C48679.4 601.714 48714.7 620.297 48746.6 644.948C48778.8 669.6 48806.9 699.181 48830.8 733.692C48854.6 767.825 48873.2 807.835 48886.5 853.724C48900.2 899.613 48907 948.915 48907 1001.63C48907 1051.31 48901.1 1098.34 48889.3 1142.71C48879.9 1181.01 48866.2 1217.04 48848.4 1250.8C48862.4 1263.69 48876.5 1273.74 48890.5 1280.95C48925.4 1298.77 48961 1309.77 48997.4 1313.94ZM48735.8 997.08C48734.6 915.921 48715.5 851.07 48678.3 802.526C48660.1 777.875 48637.3 758.723 48610 745.07C48582.7 731.038 48552.8 724.022 48520.2 724.022C48491 724.022 48464 729.521 48439.4 740.519C48414.7 751.517 48393.9 766.308 48376.8 784.891C48359.7 803.474 48345.1 825.091 48333 849.742C48321.2 874.393 48312.5 900.372 48306.8 927.678C48301.5 954.604 48298.9 982.289 48298.9 1010.73C48298.9 1046.38 48304 1082.03 48314.2 1117.68C48324.5 1152.95 48339.4 1182.91 48359.2 1207.56C48377.4 1229.94 48400.1 1247.95 48427.4 1261.61C48454.7 1275.26 48484.5 1282.08 48516.7 1282.08C48580.8 1282.08 48633.5 1256.86 48674.9 1206.42C48716.6 1155.98 48736.9 1086.2 48735.8 997.08Z" fill="white"/>
+                <path d="M49399.9 594.888V1188.22C49399.9 1231.45 49396.6 1263.69 49390.2 1284.93C49380.7 1319.44 49362.9 1347.69 49336.7 1369.69C49310.5 1391.69 49281.3 1406.86 49249.1 1415.2C49217.2 1423.54 49181.6 1427.72 49142.2 1427.72C49100.1 1427.72 49060.8 1422.79 49024.4 1412.92V1268.43C49058.5 1274.5 49090.8 1277.53 49121.1 1277.53C49135.9 1277.53 49149.2 1276.4 49160.9 1274.12C49172.7 1271.47 49182.4 1268.43 49189.9 1265.02C49197.5 1261.23 49203.8 1256.11 49208.7 1249.66C49214 1243.21 49218 1237.52 49220.7 1232.59C49223.3 1227.66 49225.2 1221.22 49226.3 1213.25C49227.9 1204.91 49228.6 1198.65 49228.6 1194.48C49229 1189.93 49229.2 1183.86 49229.2 1176.27V594.888H49399.9Z" fill="white"/>
+                <path d="M51935.9 1004.85C51935.9 1554.46 51490.3 2000 50940.7 2000C50391.1 2000 49945.6 1554.46 49945.6 1004.85C49945.6 455.251 50391.1 9.70874 50940.7 9.70874C51490.3 9.70874 51935.9 455.251 51935.9 1004.85Z" fill="#009639"/>
+                <path d="M50756.8 1086.39L50943.4 1417.48H50751.1L50583.3 1104.03H50463.3V1417.48H50294.3V594.888H50583.3C50609.9 594.888 50630.2 595.267 50644.2 596.026C50658.2 596.405 50677.8 598.301 50702.8 601.714C50727.8 604.748 50750.6 610.437 50771.1 618.78C50791.5 627.124 50810.5 638.122 50827.9 651.775C50855.6 673.392 50877.8 702.594 50894.5 739.381C50911.6 775.789 50920.1 815.041 50920.1 857.137C50920.1 921.989 50900.2 977.169 50860.4 1022.68C50848.2 1035.95 50835.3 1047.33 50821.7 1056.81C50808 1065.91 50797 1072.17 50788.7 1075.58C50780.7 1078.62 50770.1 1082.22 50756.8 1086.39ZM50463.3 729.141V971.481H50554.3C50588.8 970.722 50614.8 969.584 50632.3 968.067C50649.7 966.171 50665.2 962.189 50678.9 956.121C50724 935.642 50746.6 898.665 50746.6 845.191C50746.6 805.37 50730.7 775.22 50698.8 754.741C50688.2 747.535 50675.1 742.036 50659.6 738.243C50644 734.072 50631.1 731.607 50620.9 730.848C50610.6 730.09 50596.2 729.521 50577.6 729.141H50463.3Z" fill="white"/>
+                <path d="M51475.7 1086.39L51662.2 1417.48H51470L51302.2 1104.03H51182.1V1417.48H51013.2V594.888H51302.2C51328.7 594.888 51349 595.267 51363 596.026C51377.1 596.405 51396.6 598.301 51421.6 601.714C51446.6 604.748 51469.4 610.437 51489.9 618.78C51510.4 627.124 51529.3 638.122 51546.8 651.775C51574.5 673.392 51596.6 702.594 51613.3 739.381C51630.4 775.789 51638.9 815.041 51638.9 857.137C51638.9 921.989 51619 977.169 51579.2 1022.68C51567.1 1035.95 51554.2 1047.33 51540.5 1056.81C51526.9 1065.91 51515.9 1072.17 51507.5 1075.58C51499.6 1078.62 51488.9 1082.22 51475.7 1086.39ZM51182.1 729.141V971.481H51273.1C51307.7 970.722 51333.6 969.584 51351.1 968.067C51368.5 966.171 51384.1 962.189 51397.7 956.121C51442.9 935.642 51465.4 898.665 51465.4 845.191C51465.4 805.37 51449.5 775.22 51417.6 754.741C51407 747.535 51393.9 742.036 51378.4 738.243C51362.8 734.072 51349.9 731.607 51339.7 730.848C51329.5 730.09 51315 729.521 51296.5 729.141H51182.1Z" fill="white"/>
+                <path d="M47605.8 995.146C47605.8 1544.75 47160.2 1990.29 46610.6 1990.29C46061 1990.29 45615.5 1544.75 45615.5 995.146C45615.5 445.542 46061 0 46610.6 0C47160.2 0 47605.8 445.542 47605.8 995.146Z" fill="#FF6319"/>
+                <path d="M54198 1004.85C54198 1554.46 53752.5 2000 53202.9 2000C52653.3 2000 52207.7 1554.46 52207.7 1004.85C52207.7 455.251 52653.3 9.70874 53202.9 9.70874C53752.5 9.70874 54198 455.251 54198 1004.85Z" fill="#00A9CE"/>
+                <path d="M46697.3 1304.23L46646.1 1448.73C46619.9 1443.8 46595.4 1435.64 46572.7 1424.26C46529.8 1404.54 46494.5 1377.24 46466.9 1342.35C46452.1 1353.72 46440.1 1362.45 46431 1368.51C46421.9 1374.2 46406 1383.12 46383.2 1395.25C46360.9 1407.01 46335.5 1415.92 46307 1421.99C46278.9 1428.06 46248.8 1431.09 46216.6 1431.09C46156.6 1431.09 46101.6 1419.52 46051.6 1396.39C46001.9 1373.26 45960.6 1341.97 45927.6 1302.53C45895 1263.08 45869.5 1217.2 45851.3 1164.86C45833.5 1112.52 45824.6 1056.77 45824.6 997.611C45824.6 935.414 45834.8 877.2 45855.3 822.967C45875.8 768.356 45903.7 722.087 45938.9 684.163C45974.6 645.859 46016.7 615.708 46065.2 593.712C46114.2 571.716 46166.1 560.718 46221.1 560.718C46262.4 560.718 46302.3 566.975 46340.6 579.49C46379.3 592.005 46414.5 610.589 46446.4 635.24C46478.6 659.891 46506.7 689.472 46530.6 723.984C46554.5 758.116 46573 798.127 46586.3 844.016C46600 889.904 46606.8 939.207 46606.8 991.922C46606.8 1041.6 46600.9 1088.63 46589.2 1133C46579.7 1171.31 46566 1207.33 46548.2 1241.09C46562.2 1253.98 46576.3 1264.03 46590.3 1271.24C46625.2 1289.06 46660.8 1300.06 46697.3 1304.23ZM46435.6 987.371C46434.4 906.212 46415.3 841.361 46378.1 792.817C46359.9 768.166 46337.2 749.014 46309.9 735.361C46282.5 721.329 46252.6 714.313 46220 714.313C46190.8 714.313 46163.8 719.812 46139.2 730.81C46114.5 741.808 46093.7 756.599 46076.6 775.182C46059.6 793.765 46044.9 815.382 46032.8 840.033C46021.1 864.685 46012.3 890.663 46006.6 917.969C46001.3 944.895 45998.7 972.58 45998.7 1001.02C45998.7 1036.67 46003.8 1072.32 46014 1107.97C46024.3 1143.24 46039.3 1173.2 46059 1197.85C46077.2 1220.23 46099.9 1238.24 46127.2 1251.9C46154.6 1265.55 46184.3 1272.38 46216.6 1272.38C46280.7 1272.38 46333.4 1247.16 46374.7 1196.72C46416.4 1146.28 46436.7 1076.49 46435.6 987.371Z" fill="white"/>
+                <path d="M46725.4 585.179H47070.2C47110.7 585.179 47140.7 586.317 47160 588.592C47222.2 596.936 47269.1 619.311 47300.5 655.719C47332 691.748 47347.8 736.309 47347.8 789.404C47347.8 819.364 47341.5 848.566 47329 877.01C47316.5 905.454 47294.7 926.691 47263.6 940.724C47254.1 944.516 47241.4 948.309 47225.5 952.101C47240.2 955.514 47254.5 959.876 47268.1 965.185C47309.8 980.355 47340.7 1006.33 47360.8 1043.12C47381.3 1079.53 47391.6 1118.4 47391.6 1159.74C47391.6 1188.56 47386.3 1219.28 47375.6 1251.9C47369.6 1268.2 47362.4 1283.18 47354 1296.84C47346.1 1310.49 47337.9 1322.44 47329.6 1332.68C47321.2 1342.54 47311.2 1351.45 47299.4 1359.41C47287.7 1367 47277.2 1373.45 47268.1 1378.75C47259 1383.68 47247.5 1388.05 47233.4 1391.84C47219.4 1395.25 47208 1397.91 47199.3 1399.8C47190.6 1401.7 47178.8 1403.41 47164 1404.92C47149.2 1406.06 47138.2 1406.82 47131 1407.2C47124.2 1407.2 47113.6 1407.39 47099.2 1407.77H46725.4V585.179ZM46893.2 715.451V900.903H47036.6C47088.2 900.903 47123.1 895.404 47141.3 884.405C47146.6 881.751 47152.1 877.958 47157.8 873.028C47163.5 868.098 47169.3 859.754 47175.4 847.998C47181.5 835.862 47184.5 822.398 47184.5 807.608C47184.5 776.889 47172.4 752.806 47148.1 735.361C47131 723.604 47101.6 716.968 47059.9 715.451H46893.2ZM47058.8 1034.02H46893.2V1266.69H47050.2C47106.8 1266.69 47145.2 1262.14 47165.7 1253.03C47206.3 1235.59 47226.6 1202.59 47226.6 1154.05C47226.6 1132.05 47222.2 1112.52 47213.5 1095.46C47207.4 1084.46 47199.5 1074.98 47189.6 1067.01C47180.1 1059.05 47170.8 1053.17 47161.7 1049.38C47153 1045.21 47141.6 1041.98 47127.6 1039.71C47114 1037.05 47102.8 1035.54 47094 1035.16C47085.3 1034.78 47073.6 1034.4 47058.8 1034.02Z" fill="white"/>
+                <path d="M52823.5 904.923L52933.9 925.971C52960.8 931.28 52982.3 936.021 52998.2 940.193C53014.1 943.985 53034.2 951.381 53058.5 962.379C53082.8 973.377 53103.4 986.84 53120.5 1002.77C53164.9 1044.11 53187 1097.2 53187 1162.05C53187 1205.67 53177.8 1245.87 53159.2 1282.65C53141 1319.06 53114.8 1349.59 53080.7 1374.24C53017.7 1419.37 52935.4 1441.94 52833.8 1441.94C52676.4 1441.94 52556.4 1384.1 52473.7 1268.43L52617 1168.31C52624.2 1180.07 52630.3 1189.74 52635.2 1197.32C52640.2 1204.53 52649.5 1214.96 52663.1 1228.61C52676.8 1242.26 52690.8 1253.26 52705.2 1261.61C52720 1269.95 52739.5 1277.53 52763.8 1284.36C52788.1 1290.81 52814.6 1294.03 52843.4 1294.03C52899.2 1294.03 52942.1 1283.6 52972 1262.74C53002 1241.5 53017 1216.1 53017 1186.51C53017 1175.14 53014.9 1164.9 53010.7 1155.79C53006.9 1146.69 53000.8 1138.92 52992.5 1132.47C52984.5 1126.02 52976.8 1120.71 52969.2 1116.54C52962 1111.99 52951.9 1108.01 52939 1104.6C52926.5 1100.8 52916.8 1098.15 52910 1096.63C52903.6 1094.74 52894.1 1092.65 52881.6 1090.37L52767.2 1067.05C52739.2 1060.22 52718.1 1054.92 52704.1 1051.12C52690 1047.33 52671.6 1040.5 52648.9 1030.64C52626.5 1020.4 52607.4 1008.84 52591.4 995.942C52567.2 975.463 52548.4 951.381 52535.1 923.695C52522.2 895.631 52515.8 866.05 52515.8 834.951C52515.8 801.957 52522.6 769.911 52536.3 738.812C52550.3 707.714 52570.2 679.65 52596 654.619C52621.8 629.21 52655.3 608.92 52696.7 593.75C52738.4 578.201 52784.5 570.426 52834.9 570.426C52920.2 570.426 52997.6 591.095 53067 632.433C53085.2 643.052 53101.1 654.43 53114.8 666.566C53128.8 678.322 53139.1 687.993 53145.5 695.578C53152 702.784 53159.5 712.265 53168.3 724.022L53047.1 825.85C52994 749.621 52923.7 711.506 52836.1 711.506C52787.9 711.506 52750.3 722.125 52723.4 743.363C52696.9 764.601 52683.6 786.977 52683.6 810.49C52683.6 821.109 52685.5 830.78 52689.3 839.502C52693.5 848.225 52699.7 855.81 52708.1 862.257C52716.4 868.705 52724.4 874.204 52731.9 878.755C52739.5 882.926 52750 886.908 52763.2 890.701C52776.5 894.114 52786.6 896.769 52793.4 898.665C52800.2 900.182 52810.3 902.268 52823.5 904.923Z" fill="white"/>
+                <path d="M53567.4 904.923L53677.8 925.971C53704.7 931.28 53726.1 936.021 53742 940.193C53758 943.985 53778.1 951.381 53802.3 962.379C53826.6 973.377 53847.3 986.84 53864.3 1002.77C53908.7 1044.11 53930.9 1097.2 53930.9 1162.05C53930.9 1205.67 53921.6 1245.87 53903 1282.65C53884.8 1319.06 53858.7 1349.59 53824.5 1374.24C53761.6 1419.37 53679.3 1441.94 53577.6 1441.94C53420.2 1441.94 53300.2 1384.1 53217.5 1268.43L53360.9 1168.31C53368.1 1180.07 53374.2 1189.74 53379.1 1197.32C53384 1204.53 53393.3 1214.96 53407 1228.61C53420.6 1242.26 53434.7 1253.26 53449.1 1261.61C53463.9 1269.95 53483.4 1277.53 53507.7 1284.36C53531.9 1290.81 53558.5 1294.03 53587.3 1294.03C53643.1 1294.03 53685.9 1283.6 53715.9 1262.74C53745.8 1241.5 53760.8 1216.1 53760.8 1186.51C53760.8 1175.14 53758.7 1164.9 53754.5 1155.79C53750.8 1146.69 53744.7 1138.92 53736.3 1132.47C53728.4 1126.02 53720.6 1120.71 53713 1116.54C53705.8 1111.99 53695.8 1108.01 53682.9 1104.6C53670.4 1100.8 53660.7 1098.15 53653.9 1096.63C53647.4 1094.74 53637.9 1092.65 53625.4 1090.37L53511.1 1067.05C53483 1060.22 53462 1054.92 53447.9 1051.12C53433.9 1047.33 53415.5 1040.5 53392.7 1030.64C53370.4 1020.4 53351.2 1008.84 53335.3 995.942C53311 975.463 53292.2 951.381 53279 923.695C53266.1 895.631 53259.6 866.05 53259.6 834.951C53259.6 801.957 53266.5 769.911 53280.1 738.812C53294.1 707.714 53314.1 679.65 53339.8 654.619C53365.6 629.21 53399.2 608.92 53440.5 593.75C53482.3 578.201 53528.3 570.426 53578.8 570.426C53664.1 570.426 53741.5 591.095 53810.9 632.433C53829.1 643.052 53845 654.43 53858.7 666.566C53872.7 678.322 53882.9 687.993 53889.4 695.578C53895.8 702.784 53903.4 712.265 53912.1 724.022L53791 825.85C53737.9 749.621 53667.5 711.506 53579.9 711.506C53531.7 711.506 53494.2 722.125 53467.3 743.363C53440.7 764.601 53427.4 786.977 53427.4 810.49C53427.4 821.109 53429.3 830.78 53433.1 839.502C53437.3 848.225 53443.6 855.81 53451.9 862.257C53460.3 868.705 53468.2 874.204 53475.8 878.755C53483.4 882.926 53493.8 886.908 53507.1 890.701C53520.4 894.114 53530.4 896.769 53537.2 898.665C53544.1 900.182 53554.1 902.268 53567.4 904.923Z" fill="white"/>
+            </g>
+            <filter id="filter0_d_96_423" x="0" y="0" width="54202" height="2008" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                <feOffset dy="4"/>
+                <feGaussianBlur stdDeviation="2"/>
+                <feComposite in2="hardAlpha" operator="out"/>
+                <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+                <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_96_423"/>
+                <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_96_423" result="shape"/>
+            </filter>
+        </symbol>
+    </svg>
+
+    <!-- ========================================== -->
+    <!-- VIEW 1: INDEX / HOMEPAGE                   -->
+    <!-- ========================================== -->
+    <div id="home-view">
+        <div class="project-title" aria-label="Lines that move us">
+            <div class="project-title-text">Lines that move us</div>
+        </div>
+        <h2 class="intro-text">An index of spatial logic, wayfinding, and typographic systems in global transit.</h2>
+
+        <main class="system-grid">
+            <!-- Exhibit 01: NYCMTA (Clickable) -->
+            <a onclick="showExhibit('nyc-exhibit')" class="system-card">
+                <div class="card-number">
+                    <span>01</span>
+                    <span>&rarr;</span>
+                </div>
+                <h3 class="card-title">NYCMTA Standard</h3>
+                <p class="card-meta">Unimark International &bull; 1970</p>
+                <div class="card-visual visual-nyc">
+                    <img src="https://i.ibb.co/hFD6WWtp/MTA-NYC-Logo-Black.png" alt="MTA-NYC-Logo-Black">
+                </div>
+            </a>
+
+            <!-- Exhibit 02: Coming Soon -->
+            <div class="system-card disabled">
+                <div class="card-number">
+                    <span>02</span>
+                    <span>&mdash;</span>
+                </div>
+                <h3 class="card-title">Next station is...</h3>
+                <p class="card-meta">Coming Soon</p>
+                <div class="card-visual"></div>
+            </div>
+            
+        </main>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- VIEW 2: NYCMTA EXHIBIT                     -->
+    <!-- ========================================== -->
+    <div id="nyc-exhibit" class="exhibit-view">
+        
+        <a onclick="showHome()" class="back-btn">&larr; Back to Index</a>
+
+        <header class="exhibit-header">
+            <h1 class="exhibit-title">The NYCMTA<br>Graphics Standard</h1>
+            
+            <div class="exhibit-metadata">
+                <div class="meta-item">
+                    <strong>Design Agency</strong>
+                    <span>Unimark International</span>
+                </div>
+                <div class="meta-item">
+                    <strong>Lead Designers</strong>
+                    <span>Massimo Vignelli, Bob Noorda</span>
+                </div>
+                <div class="meta-item">
+                    <strong>Primary Typeface</strong>
+                    <span>Standard Medium / Helvetica</span>
+                </div>
+                <div class="meta-item">
+                    <strong>Year Implemented</strong>
+                    <span>1970</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="case-study-grid">
+            
+            <!-- Left Column: Context -->
+            <div class="text-column">
+                <p>Before 1970, navigating the New York City Subway was an exercise in chaos. Three formerly competing private rail companies (IRT, BMT, and IND) had merged into a single authority, leaving behind a confusing, fractured array of hand-painted signs, conflicting colors, and contradictory directions.</p>
+                
+                <p>The Transit Authority hired Unimark International to create a unified system. Massimo Vignelli and Bob Noorda spent years analyzing traffic flows underground, eventually producing the monumental 1970 <em>New York City Transit Authority Graphics Standards</em>.</p>
+
+                <p>Their solution relied on absolute modularity: strict grids, a stark black, white, and color-coded palette, and typography that prioritized legibility over ornamentation. Signs were constructed using a black horizontal band across the top to house universal messages (like "Exit" or "Downtown"), while specific line designations lived in the white space below.</p>
+            </div>
+
+            <!-- Right Column: Visual Specs -->
+            <div class="visual-column">
+
+                <!-- Color Palette -->
+                <div class="specimen-box" style="border-top: none;">
+                    <div class="specimen-label">01. Color Palette</div>
+                    
+                    <div class="palette-container">
+                        <!-- 1970 Original Palette -->
+                        <div>
+                            <h4 class="palette-col-title">1970 Unimark Ink Standard</h4>
+                            <div class="palette-grid">
+                                <div class="palette-item">
+                                    <div class="palette-swatch bg-1970-new-green"></div>
+                                    <span class="palette-usecase">Green</span>
+                                    <span class="palette-name">4, 6, CC, GG, RR, SS (BG)</span>
+                                    <span class="palette-hex">PMS 355</span>
+                                    <span class="palette-hex">#009639</span>
+                                </div>
+                                <div class="palette-item">
+                                    <div class="palette-swatch bg-1970-new-orange"></div>
+                                    <span class="palette-usecase">Orange</span>
+                                    <span class="palette-name">1, 7, B, D, F, QB, EE</span>
+                                    <span class="palette-hex">PMS 165</span>
+                                    <span class="palette-hex">#FF6319</span>
+                                </div>
+                                <div class="palette-item">
+                                    <div class="palette-swatch bg-1970-new-blue"></div>
+                                    <span class="palette-usecase">Blue</span>
+                                    <span class="palette-name">A, E</span>
+                                    <span class="palette-hex">PMS 286 / Proc. Blue</span>
+                                    <span class="palette-hex">#0039A6</span>
+                                </div>
+                                <div class="palette-item">
+                                    <div class="palette-swatch bg-1970-new-turq"></div>
+                                    <span class="palette-usecase">Turquoise / Lt Blue</span>
+                                    <span class="palette-name">3, 8, M, NX, SS (42nd St)</span>
+                                    <span class="palette-hex">PMS 312</span>
+                                    <span class="palette-hex">#00A9CE</span>
+                                </div>
+                                <div class="palette-item">
+                                    <div class="palette-swatch bg-1970-new-red"></div>
+                                    <span class="palette-usecase">Red / Magenta</span>
+                                    <span class="palette-name">2, RJ</span>
+                                    <span class="palette-hex">PMS 185</span>
+                                    <span class="palette-hex">#EE352E</span>
+                                </div>
+                                <div class="palette-item">
+                                    <div class="palette-swatch bg-1970-new-yellow"></div>
+                                    <span class="palette-usecase">Yellow</span>
+                                    <span class="palette-name">N</span>
+                                    <span class="palette-hex">PMS 116</span>
+                                    <span class="palette-hex">#FCCC0A</span>
+                                </div>
+                                <div class="palette-item">
+                                    <div class="palette-swatch bg-1970-new-black"></div>
+                                    <span class="palette-usecase">Black / Dark Grey</span>
+                                    <span class="palette-name">5, J, QJ, LL, SS (Lenox)</span>
+                                    <span class="palette-hex">Proc. Blk / 50% Blk</span>
+                                    <span class="palette-hex">#000000 / #808183</span>
+                                </div>
+                                <div class="palette-item">
+                                    <div class="palette-swatch bg-1970-new-transfer"></div>
+                                    <span class="palette-usecase">Functional: Transfer</span>
+                                    <span class="palette-name">Station Interchanges</span>
+                                    <span class="palette-hex">PMS 109</span>
+                                    <span class="palette-hex">#FFD100</span>
+                                </div>
+                                <div class="palette-item">
+                                    <div class="palette-swatch bg-1970-new-exit"></div>
+                                    <span class="palette-usecase">Functional: Exit</span>
+                                    <span class="palette-name">Egress & Emergency</span>
+                                    <span class="palette-hex">PMS 179</span>
+                                    <span class="palette-hex">#E03C31</span>
+                                </div>
+                                <div class="palette-item">
+                                    <div class="palette-swatch bg-1970-new-info"></div>
+                                    <span class="palette-usecase">Functional: Info</span>
+                                    <span class="palette-name">Booths & Maps</span>
+                                    <span class="palette-hex">PMS 299</span>
+                                    <span class="palette-hex">#00A3E0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Typography Specimen -->
+                <div class="specimen-box">
+                    <div class="specimen-label">02. Typography System</div>
+                    <div class="type-sample">AaBbCc 123</div>
+                    <div class="type-notes">
+                        <strong>Standard Medium / Helvetica:</strong> Unimark originally specified Standard (Akzidenz-Grotesk) because Helvetica lacked necessary weights at the time. By the late 1980s, the MTA officially transitioned fully to Helvetica. The standard demanded tight kerning and strictly enforced tracking to maximize impact in dimly lit stations.
+                    </div>
+
+                    <!-- Page 13 Spacing Guidelines -->
+                    <div class="spacing-rules">
+                        <h4>Letter & Word Spacing System</h4>
+                        <p><strong>The Modular Matrix:</strong> A rigorous unit system was devised to offer consistent spacing for letters and words across all three sizes of type. This system had to be scrupulously adhered to at all times to preclude inconsistency during sign manufacturing, regardless of where or when a sign was made.</p>
+                        <p><strong>Letter Spacing:</strong> To find the exact spacing for any word, sign makers consulted a master chart. They selected the preceding letter from a left-hand column and the following letter from a top row. The intersecting box dictated the exact number of space units required to separate the two letters. Fractional reductions or odd sizes were strictly avoided.</p>
+                        <p><strong>Word Spacing:</strong> An absolute rule dictates that all word spaces are to equal exactly one-half the height of the capital letter.</p>
+                        
+                        <!-- Visual Matrix Grid -->
+                        <div class="matrix-container">
+                            <div class="matrix-caption">Excerpt: Letter Spacing Units Matrix</div>
+                            <table class="spacing-matrix">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>a s g</th>
+                                        <th>b h i</th>
+                                        <th>c d e</th>
+                                        <th>f t</th>
+                                        <th>k l</th>
+                                        <th>m n u</th>
+                                        <th>o q</th>
+                                        <th>p r . ,</th>
+                                        <th>v w y</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th>a h m n</th>
+                                        <td>2</td>
+                                        <td>3</td>
+                                        <td>2</td>
+                                        <td>1</td>
+                                        <td>0</td>
+                                        <td>3</td>
+                                        <td>3</td>
+                                        <td>-1</td>
+                                        <td>1</td>
+                                    </tr>
+                                    <tr>
+                                        <th>b c e o p s</th>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>0</td>
+                                        <td>-3</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>-1</td>
+                                        <td>1</td>
+                                        <td>2</td>
+                                    </tr>
+                                    <tr>
+                                        <th>f r</th>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>0</td>
+                                        <td>2</td>
+                                        <td>0</td>
+                                    </tr>
+                                    <tr>
+                                        <th>k x</th>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>0</td>
+                                        <td>0</td>
+                                        <td>1</td>
+                                        <td>4</td>
+                                        <td>-3</td>
+                                        <td>-1</td>
+                                        <td>1</td>
+                                    </tr>
+                                    <tr>
+                                        <th>t z</th>
+                                        <td>-1</td>
+                                        <td>0</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>0</td>
+                                        <td>1</td>
+                                        <td>2</td>
+                                    </tr>
+                                    <tr>
+                                        <th>v w y</th>
+                                        <td>1</td>
+                                        <td>0</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>1</td>
+                                        <td>0</td>
+                                        <td>-1</td>
+                                        <td>1</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Color Specimen -->
+                <div class="specimen-box">
+                    <div class="specimen-label">03. Trunk Line Groupings</div>
+                    
+                    <div class="signage-board">
+                        <div class="signage-header"></div>
+                        <div class="marquee-wrapper">
+                            <div class="marquee-track">
+                                <!-- Group 1 -->
+                                <div class="marquee-group">
+                                    <!-- Re-injecting the viewBox is CRITICAL for the <use> tag so it doesn't collapse into a tiny box -->
+                                    <svg viewBox="0 0 54202 2008"><use href="#mta-badges-svg"></use></svg>
+                                </div>
+                                <!-- Group 2 (Duplicate to create a seamless infinite loop) -->
+                                <div class="marquee-group">
+                                    <svg viewBox="0 0 54202 2008"><use href="#mta-badges-svg"></use></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="type-notes" style="margin-top: 1.5rem;">
+                        <strong>Trunk Line Grouping:</strong> Instead of color-coding individual trains, Unimark color-coded the "trunk lines" (the main avenues the trains run under through Manhattan). The highly legible, color-coded badges act as the primary visual anchors of the entire transit network.
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Iconography Breakdown Section -->
+            <div class="iconography-section">
+                <div class="specimen-label">04. Iconography & Wayfinding</div>
+                <p class="iconography-desc">
+                    The structure of the arrow allows for its rotation in exactly six different directions depending on how the passenger is being directed. The arrow does not always indicate an up or down direction.
+                </p>
+                
+                <div class="icon-grid">
+                        <!-- Straight Ahead -->
+                        <div class="icon-card">
+                            <div class="icon-display inverse arrow-straight">
+                                <a href="https://imgbb.com/"><img src="https://i.ibb.co/YnCMTvC/Vector-3.png" alt="Vector 3" border="0"></a>
+                            </div>
+                            <div class="icon-label">
+                                <span>Straight Ahead / Center</span>
+                                <span class="icon-deg">0&deg;</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Down -->
+                        <div class="icon-card">
+                            <div class="icon-display arrow-down">
+                                <a href="https://imgbb.com/"><img src="https://i.ibb.co/YnCMTvC/Vector-3.png" alt="Vector 3" border="0"></a>
+                            </div>
+                            <div class="icon-label">
+                                <span>Down (Rare)</span>
+                                <span class="icon-deg">180&deg;</span>
+                            </div>
+                        </div>
+
+                        <!-- Left -->
+                        <div class="icon-card">
+                            <div class="icon-display arrow-left">
+                                <a href="https://imgbb.com/"><img src="https://i.ibb.co/YnCMTvC/Vector-3.png" alt="Vector 3" border="0"></a>
+                            </div>
+                            <div class="icon-label">
+                                <span>Left</span>
+                                <span class="icon-deg">-90&deg;</span>
+                            </div>
+                        </div>
+
+                        <!-- Right -->
+                        <div class="icon-card">
+                            <div class="icon-display inverse arrow-right">
+                                <a href="https://imgbb.com/"><img src="https://i.ibb.co/YnCMTvC/Vector-3.png" alt="Vector 3" border="0"></a>
+                            </div>
+                            <div class="icon-label">
+                                <span>Right</span>
+                                <span class="icon-deg">90&deg;</span>
+                            </div>
+                        </div>
+
+                        <!-- Bear Left -->
+                        <div class="icon-card">
+                            <div class="icon-display inverse arrow-bear-l">
+                                <a href="https://imgbb.com/"><img src="https://i.ibb.co/YnCMTvC/Vector-3.png" alt="Vector 3" border="0"></a>
+                            </div>
+                            <div class="icon-label">
+                                <span>Bear Left</span>
+                                <span class="icon-deg">-45&deg;</span>
+                            </div>
+                        </div>
+
+                        <!-- Bear Right -->
+                        <div class="icon-card">
+                            <div class="icon-display arrow-bear-r">
+                                <a href="https://imgbb.com/"><img src="https://i.ibb.co/YnCMTvC/Vector-3.png" alt="Vector 3" border="0"></a>
+                            </div>
+                            <div class="icon-label">
+                                <span>Bear Right</span>
+                                <span class="icon-deg">45&deg;</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+        </main>
+    </div>
+
+    <!-- Global Footer -->
+    <footer class="site-footer">
+        <div class="footer-legal">All work belongs to the respective authors and represented here for non- commercial purposes</div>
+        <div class="footer-author">ABINESH - 2026</div>
+    </footer>
+
+    <!-- Simple routing script to toggle between views -->
+    <script>
+        function showExhibit(exhibitId) {
+            document.getElementById('home-view').style.display = 'none';
+            document.getElementById(exhibitId).style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showHome() {
+            // Hide all exhibits
+            const exhibits = document.querySelectorAll('.exhibit-view');
+            exhibits.forEach(exhibit => exhibit.style.display = 'none');
+            
+            // Show home
+            document.getElementById('home-view').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
